@@ -1,2 +1,2 @@
 
-export { useGlobalState, createGlobalState } from './globalState';
+export { useGlobalState, createGlobalState, GlobalState } from './globalState';

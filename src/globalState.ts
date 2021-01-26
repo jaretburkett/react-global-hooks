@@ -1,20 +1,18 @@
 import { useState } from 'react';
 import { objCopy } from './util'
 
-type Hook = (newVal: any) => void;
-
-class State {
-  constructor(initialValue: any) {
+export class GlobalState<T> {
+  constructor(initialValue: T) {
     this._value = initialValue;
   }
-  private _value: any;
-  private _hooks: Hook[] = [];
+  private _value: T;
+  private _hooks: ((newVal: T) => void)[] = [];
 
-  _addHook = (hook: Hook) => {
+  _addHook = (hook: (newVal: T) => void) => {
     this._hooks.push(hook);
   }
 
-  get = () => {
+  get = ():T => {
     // use object copy to return a new instance of the object
     try {
       return objCopy(this._value);
@@ -24,7 +22,7 @@ class State {
     }
   }
 
-  set = (newVal: any) => {
+  set = (newVal: T) => {
     this._value = newVal;
     // keep an array of hooks to remove that no longer exist
     let toRemove = [];
@@ -47,18 +45,21 @@ class State {
       this._hooks.splice(this._hooks.indexOf(toRemove[i]))
     }
   }
+  use = (): [T, (newState: T) => void] => {
+    return useGlobalState(this)
+  }
 }
 
-export const createGlobalState = (initialValue: any) => {
+export const createGlobalState = <S>(initialValue: S): GlobalState<S> => {
   // return a new instance of State
-  return new State(initialValue);
+  return new GlobalState(initialValue);
 }
 
-export const useGlobalState = (state: State): [any, (newState: any) => void] => {
+export const useGlobalState = <S>(state: GlobalState<S>): [S, (newState: S) => void] => {
   // piggyback on the react hook useState
   const [value, setValue] = useState(state.get());
   // add use state set hook to the state hooks
-  state._addHook((newVal) => {
+  state._addHook((newVal:S) => {
     setValue(newVal);
   });
   // return in a same use format as react useState hook
