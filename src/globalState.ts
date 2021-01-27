@@ -12,12 +12,16 @@ export class GlobalState<T> {
     this._hooks.push(hook);
   }
 
-  get = ():T => {
-    // use object copy to return a new instance of the object
-    try {
-      return objCopy(this._value);
-    } catch (e) {
-      // objCopy failed for some reason, just return normal value
+  get = (clone:boolean = false):T => {
+    // if clone is true, use object copy to return a new instance of the object
+    if(clone){
+      try {
+        return objCopy(this._value);
+      } catch (e) {
+        // objCopy failed for some reason, just return normal value
+        return this._value;
+      }
+    } else {
       return this._value;
     }
   }
@@ -45,8 +49,13 @@ export class GlobalState<T> {
       this._hooks.splice(this._hooks.indexOf(toRemove[i]))
     }
   }
+
   use = (): [T, (newState: T) => void] => {
     return useGlobalState(this)
+  }
+
+  useValue = (): T => {
+    return useGlobalState(this)[0];
   }
 }
 

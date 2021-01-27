@@ -43,13 +43,15 @@ export default store;
 
 ### Using Global States
 
-Each global state has 3 primary methods `set`, `get`, `use`. 
+Each global state has 4 primary methods `set`, `get`, `use`, `useValue`. 
 
 `set` allows you to set a new value for the global state. eg. `myState.set('hello world')`
 
-`get` returns the current global state value. eg `myState.get()` . This will return a cloned version of the state value, and not a pointer to the actual value. Note: Using this method to get a value will not trigger an update within a react component. For that, you will need to use the `use` method.
+`get` returns the current global state value. eg `myState.get()` . This will return the current value of the state. You can optionally pass a boolean to this method to clone the value, `myState.get(true)`, which will return a copy of the value instead of a pointer to the value object. Note: Using this method to get a value will not trigger an update within a react component. For that, you will need to use the `use` or `useValue` method.
 
-`use` returns a two part array that works identicaly to React's `useState` method. eg `const [value, setValue] = myState.use()`. Ising this method in a react component will cause it to update if/when the state is updated. 
+`use` returns a two part array that works identicaly to React's `useState` method. eg `const [value, setValue] = myState.use()`. Using this method in a react component will cause it to update if/when the state is updated.
+
+`useValue` is similar to `use`, but only returns the value instead of an array of the value and a setter. This is useful when you have a react component that only needs to read and update the value, but will not change the value. eg `const value = myState.useValue()`. 
 
 You use global states similarly to how you use the React hook `useState`. There are 2 methods. The first is using the `.use()` method of the global store. Such as.
 
