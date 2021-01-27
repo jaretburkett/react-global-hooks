@@ -2,7 +2,7 @@
 
 React Global Hooks is a tiny, dead simple way to manage a global state piggy backing off React Hooks. It is extremely versatile, light weight, and fast. 
 
-Because React Global State relies on react hooks, it will only work in functional components, just like react hooks. It will not work in class components. 
+Because React Global State relies on react hooks, ~~it will only work in functional components, just like react hooks. It will not work in class components~~ (can now be used in class components with some setup, see example below). 
 
 ## Install 
 
@@ -40,10 +40,22 @@ const store = new Store();
 export default store;
 ```
 
+Or, simply
 
-### Using Global States
+```typescript
+// ./src/globalStates
 
-Each global state has 4 primary methods `set`, `get`, `use`, `useValue`. 
+import { createGlobalState } from 'react-global-hooks';
+
+export const countState1 = createGlobalState(0);
+export const countState2 = createGlobalState(0);
+
+```
+
+
+### Methods
+
+Each global state has 5 primary methods `set`, `get`, `use`, `useValue`, `onChange`. 
 
 `set` allows you to set a new value for the global state. eg. `myState.set('hello world')`
 
@@ -52,6 +64,11 @@ Each global state has 4 primary methods `set`, `get`, `use`, `useValue`.
 `use` returns a two part array that works identicaly to React's `useState` method. eg `const [value, setValue] = myState.use()`. Using this method in a react component will cause it to update if/when the state is updated.
 
 `useValue` is similar to `use`, but only returns the value instead of an array of the value and a setter. This is useful when you have a react component that only needs to read and update the value, but will not change the value. eg `const value = myState.useValue()`. 
+
+`onChange` registers a callback when the value is updated. This is useful for functions outside of react components, or to use React Global Hooks with class components (see below). eg `myState.onChange((value) => { console.log('state updated', value) })`
+
+
+### Using Global States
 
 You use global states similarly to how you use the React hook `useState`. There are 2 methods. The first is using the `.use()` method of the global store. Such as.
 
@@ -112,6 +129,38 @@ export const incrementCount1 = () => {
     store.countState1.set(store.countState1.get() + 1);
 }
 ```
+
+## Using in a class component
+
+By the easiest way to use react-global-hooks is with a functional component, as that is what it was designed for. However, it can still be used in a class component if needed. You will just have to tie it into the state object of the component manually using the `onChange` method, and use the internal class state for rendering. For example:
+
+```jsx
+import React from 'react';
+import { countState } from './count';
+
+export default class Count extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            count: countState.get()
+        }
+        countState.onChange((newVal) => {
+            this.setState({
+                count: newVal
+            })
+        })
+    }
+    render () {
+        return (
+            <div>
+                {this.state.count}
+            </div>
+        )
+    }
+}
+```
+
+This is not ideal, and I will likely improve on class component implementations in the future.
 
 ## Future Development
 

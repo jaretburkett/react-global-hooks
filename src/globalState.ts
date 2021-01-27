@@ -57,6 +57,10 @@ export class GlobalState<T> {
   useValue = (): T => {
     return useGlobalState(this)[0];
   }
+
+  onChange = (callback:(newVal: T) => void) => {
+    this._addHook(callback);
+  } 
 }
 
 export const createGlobalState = <S>(initialValue: S): GlobalState<S> => {
