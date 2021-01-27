@@ -46,7 +46,7 @@ export class GlobalState<T> {
     }
     // remove any that do not exist or failed
     for(let i = 0; i < toRemove.length; i++){
-      this._hooks.splice(this._hooks.indexOf(toRemove[i]))
+      this._hooks.splice(this._hooks.indexOf(toRemove[i]), 1)
     }
   }
 
